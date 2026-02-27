@@ -5,6 +5,7 @@ interface WorkoutContextType {
     workouts: Workout[];
     addWorkout: (workout: Omit<Workout, 'id' | 'date'>) => Promise<void>;
     loading: boolean;
+    error: string | null;
 }
 
 const WorkoutContext = createContext<WorkoutContextType | undefined>(undefined);
@@ -12,12 +13,19 @@ const WorkoutContext = createContext<WorkoutContextType | undefined>(undefined);
 export const WorkoutProvider = ({ children }: { children: ReactNode }) => {
     const [workouts, setWorkouts] = useState<Workout[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const loadWorkouts = async () => {
-            const storedWorkouts = await getWorkouts();
-            setWorkouts(storedWorkouts);
-            setLoading(false);
+            try {
+                const storedWorkouts = await getWorkouts();
+                setWorkouts(storedWorkouts);
+            } catch (e) {
+                console.error('Failed to load workouts', e);
+                setError('Impossible de charger les entraînements');
+            } finally {
+                setLoading(false);
+            }
         };
         loadWorkouts();
     }, []);
@@ -28,13 +36,21 @@ export const WorkoutProvider = ({ children }: { children: ReactNode }) => {
             id: Date.now().toString(),
             date: new Date().toISOString(),
         };
+
         const updatedWorkouts = [newWorkout, ...workouts];
         setWorkouts(updatedWorkouts);
-        await saveWorkouts(updatedWorkouts);
+
+        try {
+            await saveWorkouts(updatedWorkouts);
+        } catch (e) {
+            console.error('Failed to save workout, rolling back', e);
+            setWorkouts(workouts);
+            setError("Impossible de sauvegarder l'entraînement");
+        }
     };
 
     return (
-        <WorkoutContext.Provider value={{ workouts, addWorkout, loading }}>
+        <WorkoutContext.Provider value={{ workouts, addWorkout, loading, error }}>
             {children}
         </WorkoutContext.Provider>
     );
