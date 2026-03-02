@@ -1,3 +1,4 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useState } from 'react';
 import {
   FlatList,
@@ -6,77 +7,33 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import WorkoutCard from '../components/WorkoutCard';
 
 
-export interface Workout {
-  id: string;
-  name: string;
-  type: string;
-  category?: string;
-  duration: number;
-  calories: number;
-  intensity: 'faible' | 'moyenne' | 'élevée';
-  date: string;
-  notes?: string;
-}
 
-const simpleWorkouts: Workout[] = [
-  {
-    id: '1',
-    name: 'Morning Trail Run',
-    type: 'Running',
-    category: 'Cardio',
-    duration: 30,
-    calories: 320,
-    intensity: 'moyenne',
-    date: '2026-02-25T08:30:00Z',
-    notes: 'Sensation de fatigue modérée'
-  },
-  {
-    id: '2',
-    name: 'Evening Cycling',
-    type: 'Cycling',
-    category: 'Cardio',
-    duration: 45,
-    calories: 450,
-    intensity: 'élevée',
-    date: '2026-02-24T18:00:00Z',
-    notes: 'Bonne séance'
-  },
-  {
-    id: '3',
-    name: 'Yoga Flow',
-    type: 'Yoga',
-    category: 'Force',
-    duration: 60,
-    calories: 180,
-    intensity: 'faible',
-    date: '2026-02-23T10:00:00Z',
-    notes: 'Travail sur les bras'
-  },
-];
+import { useWorkouts } from '../context/WorkoutContext';
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
+  const { workouts } = useWorkouts();
   const categories = ['Running', 'Cycling', 'Yoga'];
   const [activeCategory, setactiveCategory] = useState('');
-  const [workouts, setWorkouts] = useState<Workout[]>(simpleWorkouts);
 
 
-  
+
+
+
 
   return (
     <SafeAreaView style={styles.container}>
 
-    
+
       <View style={styles.categoyContainer}>
         {categories.map((c, index) => (
           <TouchableOpacity
             key={index}
             style={[styles.button, activeCategory === c && styles.active]}
-            onPress={() => setactiveCategory(activeCategory === c ? '' : c)} 
+            onPress={() => setactiveCategory(activeCategory === c ? '' : c)}
           >
             <Text style={{ color: activeCategory === c ? '#fff' : '#000' }}>{c}</Text>
           </TouchableOpacity>
@@ -90,29 +47,27 @@ const HomeScreen = () => {
         </TouchableOpacity>
       </View>
 
-      
+
       <FlatList
         data={workouts}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <WorkoutCard item={item} />}
         style={styles.cards}
       />
-       <View style={styles.btnContainer}>
-        <TouchableOpacity style={styles.addBtn}>
- <Ionicons
-  name="add"
-  size={30}
-  color="black"
-  style={{
-    textShadowColor: 'rgba(0,0,0,0.4)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 1,
-  }}
-/>
-</TouchableOpacity> 
-       </View>
-      
-
+      <View style={styles.btnContainer}>
+        <TouchableOpacity style={styles.addBtn} onPress={() => { navigation.navigate('AddWorkout') }}>
+          <Ionicons
+            name="add"
+            size={30}
+            color="black"
+            style={{
+              textShadowColor: 'rgba(0,0,0,0.4)',
+              textShadowOffset: { width: 0, height: 0 },
+              textShadowRadius: 1,
+            }}
+          />
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
@@ -177,23 +132,23 @@ const styles = StyleSheet.create({
 
 
   },
-  addBtn:{
-     backgroundColor:'#13ECA4',
-     width:50,
-     height:50,
-     display:'flex',
-     justifyContent:'center',
-     alignItems:'center',
-     borderRadius:60
+  addBtn: {
+    backgroundColor: '#13ECA4',
+    width: 50,
+    height: 50,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 60
 
   },
-  btnContainer:{
-    display:'flex',
-    marginTop   :0,
-    
+  btnContainer: {
+    display: 'flex',
+    marginTop: 0,
 
-    justifyContent:'space-around',
-    alignItems:'flex-end'
+
+    justifyContent: 'space-around',
+    alignItems: 'flex-end'
   }
 
 

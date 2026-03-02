@@ -1,30 +1,35 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Workout } from '../screens/HomeScreen';
+import { useNavigation } from '@react-navigation/native';
 import moment from "moment";
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Workout } from '../storage/workout';
 
 type WorkoutCardProps = {
   item: Workout;
 };
 
 const WorkoutCard: React.FC<WorkoutCardProps> = ({ item }) => {
-  const formatDate = (date:string) => {
-  const mDate = moment(date);
-  if (mDate.isSame(moment(), 'day')) {
-    return 'Today';
-  } else if (mDate.isSame(moment().subtract(1, 'days'), 'day')) {
-    return 'Yesterday';
-  } else {
-    return mDate.format('DD MMM YYYY'); 
-  }
-};
+  const navigation = useNavigation<any>();
+  const formatDate = (date: string) => {
+    const mDate = moment(date);
+    if (mDate.isSame(moment(), 'day')) {
+      return 'Today';
+    } else if (mDate.isSame(moment().subtract(1, 'days'), 'day')) {
+      return 'Yesterday';
+    } else {
+      return mDate.format('DD MMM YYYY');
+    }
+  };
+
+  const totalMinutes = (item.duration.hours || 0) * 60 + (item.duration.minutes || 0);
+
   return (
     <View style={styles.card}>
       <View style={styles.leftSection}>
         <View style={styles.iconContainer}>
           <MaterialCommunityIcons
-            name={item.type === 'Running' ? 'run' : item.type === 'Cycling' ? 'bike' : 'yoga'}
+            name={item.type.toLowerCase() === 'running' ? 'run' : item.type.toLowerCase() === 'cycling' ? 'bike' : 'yoga'}
             size={32}
             color="#13ECA4"
           />
@@ -39,7 +44,7 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({ item }) => {
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
               <Ionicons name="time-outline" size={21} color="#94A3B8" />
-              <Text style={styles.statText}>{item.duration} min</Text>
+              <Text style={styles.statText}>{totalMinutes} min</Text>
             </View>
 
             <View style={styles.statItem}>
@@ -49,6 +54,7 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({ item }) => {
           </View>
         </View>
       </View>
+      <TouchableOpacity onPress={() => { }}>detail</TouchableOpacity>
     </View>
   );
 };

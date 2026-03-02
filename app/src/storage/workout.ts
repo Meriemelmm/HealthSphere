@@ -21,6 +21,7 @@ export interface Workout {
 export const getWorkouts = async (): Promise<Workout[]> => {
     try {
         const jsonValue = await AsyncStorage.getItem(STORAGE_KEY);
+        console.log(jsonValue);
         return jsonValue != null ? JSON.parse(jsonValue) : [];
     } catch (e) {
         console.error('Error reading workouts', e);

@@ -30,9 +30,9 @@ export default function AddWorkoutScreen() {
       await addWorkout({
         name,
         type,
-        category: type, // Using type as category for now
+        category: type, 
         duration: { hours, minutes },
-        calories: (hours * 60 + minutes) * 8, // Estimate 8 kcal per minute
+        calories: (hours * 60 + minutes) * 8, 
         intensity: level,
         notes,
       });
