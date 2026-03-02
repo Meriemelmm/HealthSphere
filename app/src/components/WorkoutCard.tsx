@@ -25,7 +25,11 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({ item }) => {
   const totalMinutes = (item.duration.hours || 0) * 60 + (item.duration.minutes || 0);
 
   return (
-    <View style={styles.card}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => navigation.navigate('WorkoutDetails', { item })}
+      activeOpacity={0.7}
+    >
       <View style={styles.leftSection}>
         <View style={styles.iconContainer}>
           <MaterialCommunityIcons
@@ -54,8 +58,7 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({ item }) => {
           </View>
         </View>
       </View>
-      <TouchableOpacity onPress={() => { }}>detail</TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 };
 
