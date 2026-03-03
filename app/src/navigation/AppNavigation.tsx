@@ -1,17 +1,17 @@
-import React from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
 
-import HomeScreen from '../screens/HomeScreen';
 import AddWorkoutScreen from '../screens/AddWorkoutScreen';
-import WorkoutDetailsScreen from '../screens/WorkoutDetailsScreen';
 import AnalyticsScreen from '../screens/AnalyticsScreen';
 import DiscoverScreen from '../screens/DiscoverScreen';
+import HomeScreen from '../screens/HomeScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import WorkoutDetailsScreen from '../screens/WorkoutDetailsScreen';
 
 const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator ();
+const Stack = createNativeStackNavigator();
 
 
 const HomeStack = () => (
@@ -45,7 +45,7 @@ const AppNavigator = () => {
           else if (route.name === 'Discover') iconName = 'compass';
           else if (route.name === 'Settings') iconName = 'settings';
 
-          return <Ionicons name={iconName} size={size} color={color} />;
+          return <Ionicons name={iconName as any} size={size} color={color} />;
         },
       })}
     >

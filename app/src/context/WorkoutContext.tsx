@@ -4,6 +4,7 @@ import { Workout, getWorkouts, saveWorkouts } from '../storage/workout';
 interface WorkoutContextType {
     workouts: Workout[];
     addWorkout: (workout: Omit<Workout, 'id' | 'date'>) => Promise<void>;
+    deleteWorkout: (id: string) => Promise<void>;
     loading: boolean;
     error: string | null;
 }
@@ -49,13 +50,27 @@ export const WorkoutProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
+    const deleteWorkout = async (id: string) => {
+        const updatedWorkouts = workouts.filter(w => w.id !== id);
+        setWorkouts(updatedWorkouts);
+
+        try {
+            await saveWorkouts(updatedWorkouts);
+        } catch (e) {
+            console.error('Failed to delete workout, rolling back', e);
+            setWorkouts(workouts);
+            setError("Impossible de supprimer l'entraînement");
+        }
+    };
+
     return (
-        <WorkoutContext.Provider value={{ workouts, addWorkout, loading, error }}>
+        <WorkoutContext.Provider value={{ workouts, addWorkout, deleteWorkout, loading, error }}>
             {children}
         </WorkoutContext.Provider>
     );
 };
 
+// Hook personnalisé pour utiliser le contexte
 export const useWorkouts = () => {
     const context = useContext(WorkoutContext);
     if (context === undefined) {

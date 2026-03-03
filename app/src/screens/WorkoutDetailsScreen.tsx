@@ -3,11 +3,14 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Octicons from '@expo/vector-icons/Octicons';
+import moment from 'moment';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useWorkouts } from '../context/WorkoutContext';
 
 export default function WorkoutDetailsScreen({ route, navigation }: any) {
   const { item } = route.params || {};
+  const { deleteWorkout } = useWorkouts();
 
   if (!item) {
     return (
@@ -23,6 +26,35 @@ export default function WorkoutDetailsScreen({ route, navigation }: any) {
   }
 
   const format = (n: number) => (n || 0).toString().padStart(2, '0');
+
+  const formatDate = (date: string) => {
+    const mDate = moment(date);
+    if (mDate.isSame(moment(), 'day')) {
+      return "Today's Session";
+    } else if (mDate.isSame(moment().subtract(1, 'days'), 'day')) {
+      return "Yesterday's Session";
+    } else {
+      return mDate.format('DD MMM YYYY');
+    }
+  };
+
+  const handleDelete = () => {
+    Alert.alert(
+      'Delete Workout',
+      'Are you sure you want to delete this workout?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            await deleteWorkout(item.id);
+            navigation.goBack();
+          },
+        },
+      ]
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -42,7 +74,7 @@ export default function WorkoutDetailsScreen({ route, navigation }: any) {
         </View>
         <Text style={styles.nameText}>{item.name}</Text>
         <Text style={styles.dateText}>
-          <MaterialIcons name="date-range" size={20} color="#64748B" /> {item.date}
+          <MaterialIcons name="date-range" size={20} color="#64748B" /> {formatDate(item.date)}
         </Text>
         <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 10 }}>
           <View style={styles.Timecontainer}>
@@ -76,7 +108,7 @@ export default function WorkoutDetailsScreen({ route, navigation }: any) {
             <MaterialIcons name="update" size={24} color="black" /> Edit Workout
           </Text>
         </TouchableOpacity> */}
-        <TouchableOpacity style={styles.removeBtn}>
+        <TouchableOpacity style={styles.removeBtn} onPress={handleDelete}>
           <Text style={styles.removeText}>
             <MaterialCommunityIcons name="delete-clock-outline" size={24} color="#DC2626" /> Delete Workout
           </Text>
