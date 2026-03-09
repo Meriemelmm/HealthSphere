@@ -6,66 +6,92 @@ import {
   Text,
   TouchableOpacity,
   View,
+  StatusBar,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import WorkoutCard from '../components/WorkoutCard';
-
-
-
 import { useWorkouts } from '../context/WorkoutContext';
 
 const HomeScreen = ({ navigation }) => {
   const { workouts } = useWorkouts();
-  const categories = ['Running', 'Cycling', 'Yoga'];
-  const [activeCategory, setactiveCategory] = useState('');
+  const categories = ['All', 'Running', 'Cycling', 'Yoga'];
+  const [activeCategory, setActiveCategory] = useState('All');
 
-
-
-
-
+  const filteredWorkouts = activeCategory === 'All'
+    ? workouts
+    : workouts.filter(w => w.type.toLowerCase() === activeCategory.toLowerCase());
 
   return (
     <SafeAreaView style={styles.container}>
-
-
-      <View style={styles.categoyContainer}>
-        {categories.map((c, index) => (
-          <TouchableOpacity
-            key={index}
-            style={[styles.button, activeCategory === c && styles.active]}
-            onPress={() => setactiveCategory(activeCategory === c ? '' : c)}
-          >
-            <Text style={{ color: activeCategory === c ? '#fff' : '#000' }}>{c}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Recent Workouts</Text>
-        <TouchableOpacity>
-          <Text style={styles.viewAll}>VIEW ALL</Text>
+      <StatusBar barStyle="dark-content" />
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.greeting}>Hello, Athlete!</Text>
+          <Text style={styles.subtitle}>Let&apos;s smash your goals today.</Text>
+        </View>
+        <TouchableOpacity style={styles.profileBtn}>
+          <View style={styles.avatar}>
+            <Ionicons name="person" size={20} color="#6366F1" />
+          </View>
         </TouchableOpacity>
       </View>
 
+      <View style={styles.categoryContainer}>
+        <FlatList
+          data={categories}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item}
+          contentContainerStyle={styles.categoryList}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={[
+                styles.categoryButton,
+                activeCategory === item && styles.activeCategoryButton,
+              ]}
+              onPress={() => setActiveCategory(item)}
+            >
+              <Text
+                style={[
+                  styles.categoryText,
+                  activeCategory === item && styles.activeCategoryText,
+                ]}
+              >
+                {item}
+              </Text>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
+
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>Recent Activities</Text>
+        <TouchableOpacity>
+          <Text style={styles.viewAll}>View All</Text>
+        </TouchableOpacity>
+      </View>
 
       <FlatList
-        data={workouts}
+        data={filteredWorkouts}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <WorkoutCard item={item} />}
-        style={styles.cards}
+        contentContainerStyle={styles.cardsList}
+        showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Ionicons name="fitness-outline" size={64} color="#CBD5E1" />
+            <Text style={styles.emptyText}>No activities found. Time to move!</Text>
+          </View>
+        }
       />
-      <View style={styles.btnContainer}>
-        <TouchableOpacity style={styles.addBtn} onPress={() => { navigation.navigate('AddWorkout') }}>
-          <Ionicons
-            name="add"
-            size={30}
-            color="black"
-            style={{
-              textShadowColor: 'rgba(0,0,0,0.4)',
-              textShadowOffset: { width: 0, height: 0 },
-              textShadowRadius: 1,
-            }}
-          />
+
+      <View style={styles.fabContainer}>
+        <TouchableOpacity
+          style={styles.addBtn}
+          onPress={() => navigation.navigate('AddWorkout')}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="add" size={32} color="#FFF" />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -76,95 +102,122 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8FAFC',
-    padding: 20,
   },
-  categoyContainer: {
+  header: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16
-  },
-  button: {
-    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#fff',
-    backgroundColor: '#fff',
-    marginRight: 15,
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 24,
   },
-  active: {
-    backgroundColor: '#13ECA4',
-    borderColor: '#13ECA4',
-  }
-  , sectionHeader: {
-
-    display: "flex",
-    justifyContent: "space-between",
-    flexDirection: 'row',
-    alignSelf: 'stretch',
+  greeting: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#0F172A',
+    letterSpacing: -0.5,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#64748B',
+    fontWeight: '500',
+    marginTop: 2,
+  },
+  profileBtn: {
+    backgroundColor: '#FFF',
+    padding: 2,
+    borderRadius: 16,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  avatar: {
+    width: 44,
+    height: 44,
+    backgroundColor: '#EEF2FF',
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  categoryContainer: {
+    marginBottom: 16,
+  },
+  categoryList: {
+    paddingHorizontal: 24,
+  },
+  categoryButton: {
     paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 10,
-
+    paddingVertical: 10,
+    borderRadius: 14,
+    backgroundColor: '#FFF',
+    marginRight: 12,
+    borderWidth: 1,
+    borderColor: '#F1F5F9',
+  },
+  activeCategoryButton: {
+    backgroundColor: '#6366F1',
+    borderColor: '#6366F1',
+  },
+  categoryText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#64748B',
+  },
+  activeCategoryText: {
+    color: '#FFF',
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    marginBottom: 16,
+    marginTop: 8,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '700',
     color: '#1E293B',
   },
-
   viewAll: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#1DB954',
-    letterSpacing: 0.5,
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6366F1',
   },
-  cards: {
-
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 16
-
-
-
+  cardsList: {
+    paddingHorizontal: 24,
+    paddingBottom: 100,
+  },
+  fabContainer: {
+    position: 'absolute',
+    bottom: 84, // Above the tab bar
+    right: 24,
   },
   addBtn: {
-    backgroundColor: '#13ECA4',
-    width: 50,
-    height: 50,
-    display: 'flex',
+    backgroundColor: '#6366F1',
+    width: 60,
+    height: 60,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 60
-
+    elevation: 8,
+    shadowColor: '#6366F1',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
   },
-  btnContainer: {
-    display: 'flex',
-    marginTop: 0,
-
-
-    justifyContent: 'space-around',
-    alignItems: 'flex-end'
-  }
-
-
-
+  emptyContainer: {
+    alignItems: 'center',
+    marginTop: 60,
+  },
+  emptyText: {
+    marginTop: 16,
+    color: '#94A3B8',
+    fontSize: 16,
+    fontWeight: '500',
+  },
 });
 
 export default HomeScreen;
-
-/* Container */
-
-/* Auto layout */
-
-
-
-
-
-
-
-
